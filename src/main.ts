@@ -14,7 +14,7 @@ export default class FileSorterPlugin extends Plugin {
 		await this.store.load();
 
 		this.patcher = new FileExplorerPatcher(this.store);
-		this.dragDrop = new DragDropManager(this.store);
+		this.dragDrop = new DragDropManager(this.store, this.patcher);
 
 		this.app.workspace.onLayoutReady(() => {
 			this.patcher.enable();

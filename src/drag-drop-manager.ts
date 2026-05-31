@@ -1,15 +1,18 @@
 import { SortOrderStore } from "./store";
+import { FileExplorerPatcher } from "./file-explorer-patcher";
 import { getParentPath, getName, isSubfolder } from "./utils";
 
 export class DragDropManager {
 	private store: SortOrderStore;
+	private patcher: FileExplorerPatcher;
 	private draggedPath: string | null = null;
 	private currentDropTarget: HTMLElement | null = null;
 	private currentDropPosition: "before" | "after" | "into" | null = null;
 	private dropIndicator!: HTMLElement;
 
-	constructor(store: SortOrderStore) {
+	constructor(store: SortOrderStore, patcher: FileExplorerPatcher) {
 		this.store = store;
+		this.patcher = patcher;
 		this.dropIndicator = document.createElement("div");
 		this.dropIndicator.className = "file-sorter-drop-indicator";
 	}
@@ -49,6 +52,7 @@ export class DragDropManager {
 		if (!path) return;
 
 		this.draggedPath = path;
+		this.patcher.pause();
 		dragEvent.dataTransfer!.effectAllowed = "move";
 		dragEvent.dataTransfer!.setData("text/plain", path);
 
@@ -216,6 +220,7 @@ export class DragDropManager {
 			.querySelectorAll(".is-being-dragged")
 			.forEach((el) => el.classList.remove("is-being-dragged"));
 		this.draggedPath = null;
+		this.patcher.resume();
 	}
 
 	private clearDropState(): void {

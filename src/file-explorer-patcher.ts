@@ -4,9 +4,18 @@ import { getName } from "./utils";
 export class FileExplorerPatcher {
 	private observer: MutationObserver | null = null;
 	private store: SortOrderStore;
+	private paused = false;
 
 	constructor(store: SortOrderStore) {
 		this.store = store;
+	}
+
+	pause(): void {
+		this.paused = true;
+	}
+
+	resume(): void {
+		this.paused = false;
 	}
 
 	enable(): void {
@@ -32,6 +41,7 @@ export class FileExplorerPatcher {
 	}
 
 	private handleMutations(mutations: MutationRecord[]): void {
+		if (this.paused) return;
 		const foldersToReorder = new Set<Element>();
 
 		for (const mutation of mutations) {
