@@ -61,7 +61,6 @@ export class FileExplorerPatcher {
 		}
 
 		for (const container of foldersToReorder) {
-			this.ensureDraggable(container);
 			this.reorderChildren(container);
 		}
 	}
@@ -138,18 +137,6 @@ export class FileExplorerPatcher {
 	}
 
 	/**
-	 * Ensure all folder elements are draggable.
-	 */
-	private ensureDraggable(container: Element): void {
-		const folders = container.querySelectorAll(".nav-folder");
-		folders.forEach((folder) => {
-			if (!folder.getAttribute("draggable")) {
-				folder.setAttribute("draggable", "true");
-			}
-		});
-	}
-
-	/**
 	 * Reorder all currently visible folder containers.
 	 */
 	reorderAllVisible(): void {
@@ -157,7 +144,6 @@ export class FileExplorerPatcher {
 			".nav-folder-children"
 		);
 		containers.forEach((container) => {
-			this.ensureDraggable(container);
 			this.reorderChildren(container);
 		});
 	}
