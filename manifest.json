@@ -1,0 +1,9 @@
+{
+	"id": "obsidian-file-sorter",
+	"name": "File Sorter",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Drag and drop to reorder files and folders in the file explorer.",
+	"author": "zh",
+	"isDesktopOnly": false
+}

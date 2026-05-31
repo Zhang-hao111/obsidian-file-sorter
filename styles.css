@@ -1,0 +1,27 @@
+/* Drag state */
+.is-being-dragged {
+	opacity: 0.4;
+}
+
+/* Drop indicator line */
+.file-sorter-drop-indicator {
+	height: 2px;
+	background-color: var(--interactive-accent);
+	border-radius: 1px;
+	pointer-events: none;
+	margin: 0;
+}
+
+.file-sorter-drop-indicator.drop-above {
+	margin-bottom: -1px;
+}
+
+.file-sorter-drop-indicator.drop-below {
+	margin-top: -1px;
+}
+
+/* Folder drop-into highlight */
+.nav-folder.drop-into > .nav-folder-title {
+	background-color: var(--background-modifier-hover);
+	border-radius: var(--radius-s);
+}

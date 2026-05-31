@@ -1,0 +1,19 @@
+{
+	"name": "obsidian-file-sorter",
+	"version": "1.0.0",
+	"description": "Drag and drop to reorder files and folders in the file explorer.",
+	"main": "main.js",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production"
+	},
+	"keywords": [],
+	"author": "zh",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/node": "^22.15.21",
+		"esbuild": "0.25.5",
+		"obsidian": "latest",
+		"typescript": "^5.8.3"
+	}
+}
