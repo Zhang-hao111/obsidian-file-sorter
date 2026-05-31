@@ -19,20 +19,20 @@ export class DragDropManager {
 		const container = document.querySelector(".nav-files-container");
 		if (!container) return;
 
-		container.addEventListener("dragstart", this.onDragStart, true);
-		container.addEventListener("dragover", this.onDragOver, true);
-		container.addEventListener("drop", this.onDrop, true);
-		container.addEventListener("dragend", this.onDragEnd, true);
+		container.addEventListener("dragstart", this.onDragStart);
+		container.addEventListener("dragover", this.onDragOver);
+		container.addEventListener("drop", this.onDrop);
+		container.addEventListener("dragend", this.onDragEnd);
 	}
 
 	disable(): void {
 		const container = document.querySelector(".nav-files-container");
 		if (!container) return;
 
-		container.removeEventListener("dragstart", this.onDragStart, true);
-		container.removeEventListener("dragover", this.onDragOver, true);
-		container.removeEventListener("drop", this.onDrop, true);
-		container.removeEventListener("dragend", this.onDragEnd, true);
+		container.removeEventListener("dragstart", this.onDragStart);
+		container.removeEventListener("dragover", this.onDragOver);
+		container.removeEventListener("drop", this.onDrop);
+		container.removeEventListener("dragend", this.onDragEnd);
 		this.cleanup();
 	}
 
@@ -89,7 +89,6 @@ export class DragDropManager {
 
 	private onDrop = (e: Event): void => {
 		e.preventDefault();
-		e.stopPropagation();
 		const dragEvent = e as DragEvent;
 
 		if (!this.draggedPath) {
