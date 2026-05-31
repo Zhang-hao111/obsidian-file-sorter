@@ -1,4 +1,5 @@
 import { SortOrderStore } from "./store";
+import { getName } from "./utils";
 
 export class FileExplorerPatcher {
 	private observer: MutationObserver | null = null;
@@ -50,6 +51,7 @@ export class FileExplorerPatcher {
 		}
 
 		for (const container of foldersToReorder) {
+			this.ensureDraggable(container);
 			this.reorderChildren(container);
 		}
 	}
@@ -121,7 +123,20 @@ export class FileExplorerPatcher {
 		const title =
 			el.querySelector(".nav-file-title") ??
 			el.querySelector(".nav-folder-title");
-		return title?.getAttribute("data-path") ?? "";
+		const path = title?.getAttribute("data-path") ?? "";
+		return getName(path);
+	}
+
+	/**
+	 * Ensure all folder elements are draggable.
+	 */
+	private ensureDraggable(container: Element): void {
+		const folders = container.querySelectorAll(".nav-folder");
+		folders.forEach((folder) => {
+			if (!folder.getAttribute("draggable")) {
+				folder.setAttribute("draggable", "true");
+			}
+		});
 	}
 
 	/**
@@ -132,6 +147,7 @@ export class FileExplorerPatcher {
 			".nav-folder-children"
 		);
 		containers.forEach((container) => {
+			this.ensureDraggable(container);
 			this.reorderChildren(container);
 		});
 	}
