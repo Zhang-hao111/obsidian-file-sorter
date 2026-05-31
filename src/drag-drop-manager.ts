@@ -6,7 +6,7 @@ export class DragDropManager {
 	private store: SortOrderStore;
 	private patcher: FileExplorerPatcher;
 	private draggedPath: string | null = null;
-	private dropIndicator!: HTMLElement;
+	private dropIndicator: HTMLElement;
 
 	constructor(store: SortOrderStore, patcher: FileExplorerPatcher) {
 		this.store = store;
@@ -37,87 +37,75 @@ export class DragDropManager {
 	}
 
 	private onDragStart = (e: Event): void => {
-		const dragEvent = e as DragEvent;
-		const target = (e.target as HTMLElement).closest(".nav-file") as HTMLElement | null;
-		if (!target) return;
+		const el = e.target as HTMLElement;
+		if (!el.closest(".nav-file")) return;
 
-		const title = target.querySelector(".nav-file-title");
+		const title = el.closest(".nav-file")!.querySelector(".nav-file-title");
 		const path = title?.getAttribute("data-path");
 		if (!path) return;
 
 		this.draggedPath = path;
 		this.patcher.pause();
-		dragEvent.dataTransfer!.effectAllowed = "move";
-		dragEvent.dataTransfer!.setData("text/plain", path);
+		(e as DragEvent).dataTransfer!.effectAllowed = "move";
+		(e as DragEvent).dataTransfer!.setData("text/plain", path);
 
 		requestAnimationFrame(() => {
-			target.classList.add("is-being-dragged");
+			el.closest(".nav-file")!.classList.add("is-being-dragged");
 		});
 	};
 
 	private onDragOver = (e: Event): void => {
-		e.preventDefault();
-		const dragEvent = e as DragEvent;
-		dragEvent.dataTransfer!.dropEffect = "move";
-
 		if (!this.draggedPath) return;
 
-		const target = (e.target as HTMLElement).closest(".nav-file") as HTMLElement | null;
-		if (!target) {
+		const fileEl = (e.target as HTMLElement).closest(".nav-file") as HTMLElement | null;
+		if (!fileEl) {
 			this.dropIndicator.remove();
 			return;
 		}
 
-		const targetPath = target.querySelector(".nav-file-title")?.getAttribute("data-path") ?? "";
+		e.preventDefault();
+		(e as DragEvent).dataTransfer!.dropEffect = "move";
+
+		const targetPath = fileEl.querySelector(".nav-file-title")?.getAttribute("data-path") ?? "";
 		if (this.draggedPath === targetPath) {
 			this.dropIndicator.remove();
 			return;
 		}
 
-		const rect = target.getBoundingClientRect();
-		const y = dragEvent.clientY - rect.top;
+		const rect = fileEl.getBoundingClientRect();
+		const y = (e as DragEvent).clientY - rect.top;
 		const position = y < rect.height / 2 ? "before" : "after";
 
 		this.dropIndicator.className =
 			"file-sorter-drop-indicator" +
 			(position === "before" ? " drop-above" : " drop-below");
-		target.parentElement?.insertBefore(
+		fileEl.parentElement?.insertBefore(
 			this.dropIndicator,
-			position === "before" ? target : target.nextSibling
+			position === "before" ? fileEl : fileEl.nextSibling
 		);
 	};
 
 	private onDrop = (e: Event): void => {
+		if (!this.draggedPath) return;
+
+		const fileEl = (e.target as HTMLElement).closest(".nav-file") as HTMLElement | null;
+		if (!fileEl) return;
+
 		e.preventDefault();
-		const dragEvent = e as DragEvent;
 
-		if (!this.draggedPath) {
-			this.cleanup();
-			return;
-		}
-
-		const target = (e.target as HTMLElement).closest(".nav-file") as HTMLElement | null;
-		if (!target) {
-			this.cleanup();
-			return;
-		}
-
-		const targetPath = target.querySelector(".nav-file-title")?.getAttribute("data-path") ?? "";
-		if (this.draggedPath === targetPath) {
-			this.cleanup();
-			return;
-		}
+		const targetPath = fileEl.querySelector(".nav-file-title")?.getAttribute("data-path") ?? "";
+		if (this.draggedPath === targetPath) return;
 
 		const draggedName = getName(this.draggedPath);
 		const fromFolder = getParentPath(this.draggedPath);
 		const toFolder = getParentPath(targetPath);
 
-		const siblings = Array.from(target.parentElement!.children).filter(
+		const siblings = Array.from(fileEl.parentElement!.children).filter(
 			(el) => el.classList.contains("nav-file") || el.classList.contains("nav-folder")
 		);
-		const targetItemIndex = siblings.indexOf(target);
-		const rect = target.getBoundingClientRect();
-		const y = dragEvent.clientY - rect.top;
+		const targetItemIndex = siblings.indexOf(fileEl);
+		const rect = fileEl.getBoundingClientRect();
+		const y = (e as DragEvent).clientY - rect.top;
 		const position = y < rect.height / 2 ? "before" : "after";
 		const targetIndex = position === "before" ? targetItemIndex : targetItemIndex + 1;
 
@@ -125,7 +113,7 @@ export class DragDropManager {
 		this.cleanup();
 	};
 
-	private onDragEnd = (e: Event): void => {
+	private onDragEnd = (): void => {
 		this.cleanup();
 	};
 
@@ -137,7 +125,6 @@ export class DragDropManager {
 		this.draggedPath = null;
 		this.patcher.resume();
 
-		// Force reorder after Obsidian re-renders
 		setTimeout(() => {
 			this.patcher.reorderAllVisible();
 		}, 200);
