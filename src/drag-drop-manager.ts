@@ -16,19 +16,22 @@ export class DragDropManager {
 	}
 
 	enable(): void {
-		const container = document.querySelector(".nav-files-container");
-		if (!container) return;
-
-		container.addEventListener("dragstart", this.onDragStart);
-		container.addEventListener("dragover", this.onDragOver);
-		container.addEventListener("drop", this.onDrop);
-		container.addEventListener("dragend", this.onDragEnd);
+		// Disabled for debugging
+		// const container = document.querySelector(".nav-files-container");
+		// if (!container) return;
+		//
+		// container.addEventListener("mousedown", this.onMouseDown);
+		// container.addEventListener("dragstart", this.onDragStart);
+		// container.addEventListener("dragover", this.onDragOver);
+		// container.addEventListener("drop", this.onDrop);
+		// container.addEventListener("dragend", this.onDragEnd);
 	}
 
 	disable(): void {
 		const container = document.querySelector(".nav-files-container");
 		if (!container) return;
 
+		container.removeEventListener("mousedown", this.onMouseDown);
 		container.removeEventListener("dragstart", this.onDragStart);
 		container.removeEventListener("dragover", this.onDragOver);
 		container.removeEventListener("drop", this.onDrop);
@@ -36,22 +39,32 @@ export class DragDropManager {
 		this.cleanup();
 	}
 
-	private onDragStart = (e: Event): void => {
-		const el = e.target as HTMLElement;
-		if (!el.closest(".nav-file")) return;
+	// Track if user is dragging a file (not clicking to expand)
+	private onMouseDown = (e: Event): void => {
+		const me = e as MouseEvent;
+		const fileEl = (me.target as HTMLElement).closest(".nav-file");
+		if (!fileEl) return;
 
-		const title = el.closest(".nav-file")!.querySelector(".nav-file-title");
+		const title = fileEl.querySelector(".nav-file-title");
 		const path = title?.getAttribute("data-path");
 		if (!path) return;
 
 		this.draggedPath = path;
+	};
+
+	private onDragStart = (e: Event): void => {
+		if (!this.draggedPath) return;
+
 		this.patcher.pause();
 		(e as DragEvent).dataTransfer!.effectAllowed = "move";
-		(e as DragEvent).dataTransfer!.setData("text/plain", path);
+		(e as DragEvent).dataTransfer!.setData("text/plain", this.draggedPath);
 
-		requestAnimationFrame(() => {
-			el.closest(".nav-file")!.classList.add("is-being-dragged");
-		});
+		const fileEl = (e.target as HTMLElement).closest(".nav-file");
+		if (fileEl) {
+			requestAnimationFrame(() => {
+				fileEl.classList.add("is-being-dragged");
+			});
+		}
 	};
 
 	private onDragOver = (e: Event): void => {

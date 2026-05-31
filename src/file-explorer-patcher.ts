@@ -19,18 +19,19 @@ export class FileExplorerPatcher {
 	}
 
 	enable(): void {
-		this.observer = new MutationObserver((mutations) => {
-			this.handleMutations(mutations);
-		});
-
-		const container = document.querySelector(".nav-files-container");
-		if (container) {
-			this.observer.observe(container, {
-				childList: true,
-				subtree: true,
-			});
-			this.reorderAllVisible();
-		}
+		// Disabled for debugging
+		// this.observer = new MutationObserver((mutations) => {
+		// 	this.handleMutations(mutations);
+		// });
+		//
+		// const container = document.querySelector(".nav-files-container");
+		// if (container) {
+		// 	this.observer.observe(container, {
+		// 		childList: true,
+		// 		subtree: true,
+		// 	});
+		// 	this.reorderAllVisible();
+		// }
 	}
 
 	disable(): void {
